@@ -55,10 +55,6 @@ Main public classes
 Helper classes and functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: qubes.features.Features
-   :members:
-   :show-inheritance:
-
 .. autoclass:: qubes.vm.mix.net.NetVMMixin
    :members:
    :show-inheritance:

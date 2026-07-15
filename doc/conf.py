@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -289,3 +290,24 @@ intersphinx_mapping = {
     'core-admin-client': ('https://dev.qubes-os.org/projects/core-admin-client/en/latest/', None),
     'core-qrexec': ('https://dev.qubes-os.org/projects/qubes-core-qrexec/en/stable/', None),
 }
+
+if limit := os.environ.get("QUBES_DOC_LOCAL_INTERSPHINX_CACHE_LIMIT"):
+    intersphinx_cache_limit = int(limit)
+
+if os.environ.get("QUBES_DOC_LOCAL_INTERSPHINX", "").lower() in ("true", "on", "1"):
+    local_pattern = os.environ.get(
+        "QUBES_DOC_LOCAL_INTERSPHINX_PATTERN", "../../{path}/_build/html"
+    )
+    for repo, (target, inventory) in intersphinx_mapping.items():
+        if re.match(r'https://(dev|doc)\.qubes-os.org/', target):
+            variable_name = "QUBES_DOC_LOCAL_INTERSPHINX_TARGET_{}".format(repo.replace('-', '_').upper())
+            new_target = os.environ.get(variable_name)
+
+            if not new_target:
+                if repo == "qubes-doc":
+                    path = repo
+                else:
+                    path = "qubes-{name}/doc".format(name=repo.removeprefix('qubes-'))
+                new_target = local_pattern.format(path=path)
+
+            intersphinx_mapping[repo] = (new_target, inventory)
